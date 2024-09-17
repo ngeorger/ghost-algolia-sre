@@ -18,7 +18,19 @@ exports.handler = async (event) => {
         };
     }
 
-    if (!event.headers['user-agent'].includes('https://github.com/TryGhost/Ghost')) {
+    const userAgent = event.headers['user-agent'];
+
+    try {
+        const url = new URL(userAgent);
+        const hostPattern = /(^|\.)github\.com$/;
+
+        if (!hostPattern.test(url.hostname)) {
+            return {
+                statusCode: 401,
+                body: `Unauthorized`
+            };
+        }
+    } catch (e) {
         return {
             statusCode: 401,
             body: `Unauthorized`
